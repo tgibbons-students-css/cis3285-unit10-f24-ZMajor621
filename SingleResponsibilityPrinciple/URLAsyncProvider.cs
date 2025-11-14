@@ -17,19 +17,22 @@ namespace SingleResponsibilityPrinciple
             this.localProvider = localProvider;
         }
 
-        public Task<IEnumerable<string>> GetTradeAsync()
-        {
-            Task<IEnumerable<string>> task = Task.Run(() => localProvider.GetTradeData());
-            return task;
-        }
+        //public Task<IEnumerable<string>> GetTradeAsync()
+       // {
+        //    Task<IEnumerable<string>> task = Task.Run(() => localProvider.GetTradeData());
+        //    return task;
+        //}
 
-        public IEnumerable<string> GetTradeData()
+        public async IAsyncEnumerable<string> GetTradeData()
         {
-            Task<IEnumerable<string>> task = Task.Run(() => GetTradeAsync());
+            Task<IAsyncEnumerable<string>> task = Task.Run(() => localProvider.GetTradeData());
             task.Wait();
 
-            IEnumerable<string> tradeList = task.Result;
-            return tradeList;
+            IAsyncEnumerable<string> tradeList = task.Result;
+            await foreach (var trade in tradeList)
+            {
+                yield return trade;
+            }
         }
     }    
 }

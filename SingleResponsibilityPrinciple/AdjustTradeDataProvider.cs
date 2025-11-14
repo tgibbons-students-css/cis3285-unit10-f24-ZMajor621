@@ -16,19 +16,22 @@ namespace SingleResponsibilityPrinciple
             this.localProvider = localProvider;
         }
 
-        public IEnumerable<string> GetTradeData()
+        public async IAsyncEnumerable<string> GetTradeData()
         {
             //call original provider to get data
-            IEnumerable<string> lines = localProvider.GetTradeData();
+            IAsyncEnumerable<string> lines = localProvider.GetTradeData();
 
             List<string> result = new List<string>();
 
             // Adjust "GBP to "EUR" in all the txt lines
-            foreach (string line in lines)
+            await foreach (string line in lines)
             {
                 result.Add(line.Replace("GBP", "EUR"));
             }
-            return result;
+            foreach (var item in result)
+            {
+                yield return item;
+            }
         }
     }    
 }
